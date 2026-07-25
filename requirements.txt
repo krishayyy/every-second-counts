@@ -1,0 +1,11 @@
+matplotlib==3.11.1
+networkx==3.6.1
+numpy==2.5.1
+pydeck==0.9.3
+pylatexenc==2.10
+python-dotenv==1.2.2
+qiskit==2.5.1
+qiskit-aer==0.17.2
+requests==2.34.2
+scipy==1.18.0
+streamlit==1.60.0
