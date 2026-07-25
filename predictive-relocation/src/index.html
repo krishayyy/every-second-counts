@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>EMS Predictive Relocation Simulator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+  :root {
+    --bg: #0b0d10;
+    --panel: #14171c;
+    --border: #262b33;
+    --text: #eef0f2;
+    --muted: #8a929e;
+    --accent: #4f8cff;
+    --good: #33c17a;
+    --bad: #ff5c5c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg); color: var(--text); height: 100vh; overflow: hidden;
+  }
+  #app { display: flex; height: 100vh; }
+  #map { flex: 1; }
+  #sidebar {
+    width: 340px; background: var(--panel); border-left: 1px solid var(--border);
+    padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px;
+  }
+  h1 { font-size: 15px; margin: 0 0 4px; letter-spacing: 0.2px; }
+  .sub { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
+  .card {
+    background: #191c22; border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px; display: flex; flex-direction: column; gap: 4px;
+  }
+  .card .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .card .value { font-size: 22px; font-weight: 600; }
+  .card .value.good { color: var(--good); }
+  .row { display: flex; gap: 10px; }
+  .row .card { flex: 1; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px; font-size: 11px;
+    padding: 3px 8px; border-radius: 20px; background: rgba(51,193,122,0.15); color: var(--good);
+    width: fit-content;
+  }
+  .badge.bad { background: rgba(255,92,92,0.15); color: var(--bad); }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  #timeSlider { width: 100%; }
+  .time-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+  .legend { display: flex; gap: 14px; font-size: 12px; color: var(--muted); }
+  .legend span { display: flex; align-items: center; gap: 6px; }
+  .swatch { width: 10px; height: 10px; border-radius: 50%; }
+  select {
+    background: #191c22; color: var(--text); border: 1px solid var(--border);
+    padding: 8px; border-radius: 6px; font-size: 13px;
+  }
+  #playBtn {
+    background: var(--accent); color: white; border: none; border-radius: 6px;
+    padding: 8px 12px; font-size: 13px; cursor: pointer; font-weight: 500;
+  }
+  #playBtn:hover { opacity: 0.9; }
+  .footer-note { font-size: 11px; color: var(--muted); line-height: 1.5; margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border); }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="map"></div>
+  <div id="sidebar">
+    <div>
+      <h1>EMS Predictive Relocation</h1>
+      <div class="sub">Montgomery County, PA &middot; real 911 EMS data, 2015&ndash;2020</div>
+    </div>
+
+    <div class="card">
+      <div class="label">Time window</div>
+      <select id="bucketSelect"></select>
+      <input type="range" id="timeSlider" min="0" max="17" value="0" />
+      <div class="time-label"><span id="bucketName">-</span><span id="callCount">-</span></div>
+      <button id="playBtn">▶ Play through the day</button>
+    </div>
+
+    <div class="row">
+      <div class="card">
+        <div class="label">Baseline dist</div>
+        <div class="value" id="baselineDist">-</div>
+      </div>
+      <div class="card">
+        <div class="label">Recommended dist</div>
+        <div class="value good" id="recDist">-</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="label">Improvement this window</div>
+      <div class="value good" id="pctImprove">-</div>
+      <div class="badge" id="improveBadge"><span class="dot"></span><span>faster avg reach</span></div>
+    </div>
+
+    <div class="card">
+      <div class="label">Overall (all 332,692 EMS calls)</div>
+      <div class="value good" id="overallStat">-</div>
+      <div class="sub" id="overallSub">-</div>
+    </div>
+
+    <div class="legend">
+      <span><span class="swatch" style="background:#ff5c5c"></span>Static baseline post</span>
+      <span><span class="swatch" style="background:#33c17a"></span>Recommended post</span>
+    </div>
+
+    <div class="footer-note">
+      Baseline = 4 fixed posts, clustered once on all-time data (models "always parked in the same spot"). Recommended = 4 posts re-clustered per time window from real historical call density. Distance-to-time uses a flat 30&nbsp;mph assumption, not real road routing &mdash; treat minutes as directional, not exact.
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+async function main() {
+  const res = await fetch('../data/relocation_model.json');
+  const data = await res.json();
+
+  const map = L.map('map', { zoomControl: true }).setView([40.15, -75.35], 11);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; OpenStreetMap &copy; CARTO', maxZoom: 19
+  }).addTo(map);
+  setTimeout(() => map.invalidateSize(), 0);
+  window.addEventListener('resize', () => map.invalidateSize());
+
+  const bucketKeys = Object.keys(data.buckets);
+  const select = document.getElementById('bucketSelect');
+  bucketKeys.forEach((k, i) => {
+    const opt = document.createElement('option');
+    opt.value = i; opt.textContent = k.replace('_', ' &middot; ').replace('-', ':00–') ;
+    opt.textContent = k;
+    select.appendChild(opt);
+  });
+
+  let baselineMarkers = [];
+  let recMarkers = [];
+
+  function clearMarkers() {
+    baselineMarkers.forEach(m => map.removeLayer(m));
+    recMarkers.forEach(m => map.removeLayer(m));
+    baselineMarkers = []; recMarkers = [];
+  }
+
+  function renderBucket(idx) {
+    const key = bucketKeys[idx];
+    const b = data.buckets[key];
+    clearMarkers();
+
+    data.static_baseline_posts.forEach(p => {
+      const m = L.circleMarker([p.lat, p.lng], {
+        radius: 9, color: '#ff5c5c', fillColor: '#ff5c5c', fillOpacity: 0.85, weight: 2
+      }).addTo(map).bindTooltip('Static post', { permanent: false });
+      baselineMarkers.push(m);
+    });
+
+    b.posts.forEach(p => {
+      const m = L.circleMarker([p.lat, p.lng], {
+        radius: 11, color: '#33c17a', fillColor: '#33c17a', fillOpacity: 0.9, weight: 2
+      }).addTo(map).bindTooltip('Recommended post', { permanent: false });
+      recMarkers.push(m);
+    });
+
+    document.getElementById('bucketName').textContent = key;
+    document.getElementById('callCount').textContent = b.n_calls.toLocaleString() + ' calls';
+    document.getElementById('baselineDist').textContent = b.avg_dist_baseline_mi.toFixed(2) + ' mi';
+    document.getElementById('recDist').textContent = b.avg_dist_recommended_mi.toFixed(2) + ' mi';
+    document.getElementById('pctImprove').textContent = (b.pct_improvement > 0 ? '+' : '') + b.pct_improvement + '%';
+
+    const badge = document.getElementById('improveBadge');
+    if (b.pct_improvement >= 0) {
+      badge.classList.remove('bad');
+      badge.querySelector('span:last-child').textContent = 'faster avg reach';
+    } else {
+      badge.classList.add('bad');
+      badge.querySelector('span:last-child').textContent = 'slower this window';
+    }
+
+    select.value = idx;
+    document.getElementById('timeSlider').value = idx;
+  }
+
+  document.getElementById('overallStat').textContent = data.minutes_saved + ' min saved';
+  document.getElementById('overallSub').textContent =
+    `${data.pct_improvement_overall}% shorter distance on avg · ${data.pct_calls_with_shorter_distance}% of calls improved · p ${data.wilcoxon_p_value < 0.0001 ? '< 0.0001' : '= ' + data.wilcoxon_p_value.toFixed(4)}`;
+
+  select.addEventListener('change', e => renderBucket(+e.target.value));
+  document.getElementById('timeSlider').addEventListener('input', e => renderBucket(+e.target.value));
+
+  let playing = false, playTimer = null;
+  document.getElementById('playBtn').addEventListener('click', function () {
+    playing = !playing;
+    this.textContent = playing ? '⏸ Pause' : '▶ Play through the day';
+    if (playing) {
+      playTimer = setInterval(() => {
+        let next = (+document.getElementById('timeSlider').value + 1) % bucketKeys.length;
+        renderBucket(next);
+      }, 1400);
+    } else {
+      clearInterval(playTimer);
+    }
+  });
+
+  renderBucket(0);
+}
+
+main();
+</script>
+</body>
+</html>

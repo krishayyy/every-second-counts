@@ -1,0 +1,130 @@
+[
+  {
+    "lat": 47.59997778856383,
+    "lng": -122.32623105718085,
+    "zone_id": 0,
+    "display_name": "Panama Hotel, 605, South Main Street, Japantown, Chinatown International District, Seattle, King County, Washington, 98104, United States",
+    "street": "605 South Main Street",
+    "neighborhood": "Japantown"
+  },
+  {
+    "lat": 47.61581037973967,
+    "lng": -122.34402697679683,
+    "zone_id": 5,
+    "display_name": "2306, 4th Avenue, Belltown, Seattle, King County, Washington, 98121, United States",
+    "street": "2306 4th Avenue",
+    "neighborhood": "Belltown"
+  },
+  {
+    "lat": 47.617815856819895,
+    "lng": -122.32358603918614,
+    "zone_id": 19,
+    "display_name": "620, East Howell Street, Capitol Hill, Seattle, King County, Washington, 98122, United States",
+    "street": "620 East Howell Street",
+    "neighborhood": "Capitol Hill"
+  },
+  {
+    "lat": 47.694672109375,
+    "lng": -122.35198552539063,
+    "zone_id": 8,
+    "display_name": "510, North 90th Street, Greenwood, Seattle, King County, Washington, 98103, United States",
+    "street": "510 North 90th Street",
+    "neighborhood": "Greenwood"
+  },
+  {
+    "lat": 47.54607537037037,
+    "lng": -122.28244928240741,
+    "zone_id": 3,
+    "display_name": "Aki Kurose Middle School, 3928, South Graham Street, Rainier Valley, Seattle, King County, Washington, 98118, United States",
+    "street": "3928 South Graham Street",
+    "neighborhood": "Rainier Valley"
+  },
+  {
+    "lat": 47.663794785450065,
+    "lng": -122.3148381134402,
+    "zone_id": 13,
+    "display_name": "4722, 12th Avenue Northeast, Greek Row, University Heights, University District, Seattle, King County, Washington, 98105, United States",
+    "street": "4722 12th Avenue Northeast",
+    "neighborhood": "Greek Row"
+  },
+  {
+    "lat": 47.720559436619716,
+    "lng": -122.29533018779343,
+    "zone_id": 1,
+    "display_name": "30th Avenue Northeast, Olympic Hills, Lake City, Seattle, King County, Washington, 98165, United States",
+    "street": "30th Avenue Northeast",
+    "neighborhood": "Lake City"
+  },
+  {
+    "lat": 47.57738013969571,
+    "lng": -122.3014068879668,
+    "zone_id": 12,
+    "display_name": "2363, South Forest Street, Beacon Hill, Seattle, King County, Washington, 98144, United States",
+    "street": "2363 South Forest Street",
+    "neighborhood": "Beacon Hill"
+  },
+  {
+    "lat": 47.67533209046053,
+    "lng": -122.38142868256578,
+    "zone_id": 16,
+    "display_name": "1758, Northwest 64th Street, Ballard, Seattle, King County, Washington, 98107, United States",
+    "street": "1758 Northwest 64th Street",
+    "neighborhood": "Ballard"
+  },
+  {
+    "lat": 47.555085125,
+    "lng": -122.37700743297101,
+    "zone_id": 4,
+    "display_name": "5216, 36th Avenue Southwest, Fairmont Springs, Delridge, Seattle, King County, Washington, 98126, United States",
+    "street": "5216 36th Avenue Southwest",
+    "neighborhood": "Fairmont Springs"
+  },
+  {
+    "lat": 47.51774554961832,
+    "lng": -122.26809079898219,
+    "zone_id": 14,
+    "display_name": "9350, Sturtevant Avenue South, Rainier Beach, Seattle, King County, Washington, 98118, United States",
+    "street": "9350 Sturtevant Avenue South",
+    "neighborhood": "Rainier Beach"
+  },
+  {
+    "lat": 47.65143479754601,
+    "lng": -122.35076594274028,
+    "zone_id": 2,
+    "display_name": "610, North 36th Street, Fremont, Seattle, King County, Washington, 98103, United States",
+    "street": "610 North 36th Street",
+    "neighborhood": "Fremont"
+  },
+  {
+    "lat": 47.52420390807175,
+    "lng": -122.37031560986547,
+    "zone_id": 18,
+    "display_name": "8815, 29th Avenue Southwest, Westwood, Seattle, King County, Washington, 98126, United States",
+    "street": "8815 29th Avenue Southwest",
+    "neighborhood": "Westwood"
+  },
+  {
+    "lat": 47.61184926279391,
+    "lng": -122.30094439695712,
+    "zone_id": 9,
+    "display_name": "1108, 24th Avenue, Madison Valley, Central District, Seattle, King County, Washington, 98122, United States",
+    "street": "1108 24th Avenue",
+    "neighborhood": "Madison Valley"
+  },
+  {
+    "lat": 47.70361682142857,
+    "lng": -122.32111062585034,
+    "zone_id": 7,
+    "display_name": "10315, 8th Avenue Northeast, Victory Heights, Maple Leaf, Seattle, King County, Washington, 98125, United States",
+    "street": "10315 8th Avenue Northeast",
+    "neighborhood": "Maple Leaf"
+  },
+  {
+    "lat": 47.53565319005848,
+    "lng": -122.33064019005847,
+    "zone_id": 15,
+    "display_name": "251, South Webster Street, Georgetown, Seattle, King County, Washington, 98108, United States",
+    "street": "251 South Webster Street",
+    "neighborhood": "Georgetown"
+  }
+]
